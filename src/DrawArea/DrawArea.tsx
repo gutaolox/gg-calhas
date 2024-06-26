@@ -21,6 +21,7 @@ export const DrawArea = (props: DrawAreaProps) => {
     context.fillRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = '#000000'; // Preto
     context.lineWidth = 3;
+    context.font = "bold 16px Roboto";
     let currentX = 375;
     let currentY = 500;
     let currentAngle = 0;

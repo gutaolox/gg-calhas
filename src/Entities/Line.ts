@@ -1,7 +1,8 @@
-import { centimeterToPixelConversor, convertDeegreToRadian } from "@/util/convertDeegreToRadian";
+import {
+  centimeterToPixelConversor,
+} from "@/util/convertDeegreToRadian";
 import { Draw } from "./Draw";
 import { Orientation } from "./Orientation";
-
 
 export class Line extends Draw {
   calculateNextPoint(
@@ -37,21 +38,21 @@ export class Line extends Draw {
     if (orientation === Orientation.HORIZONTAL) {
       canvasContext.fillText(
         `${this.size}`,
-        middleX - 2,
-        middleY + multiplier * numberToMove+4
+        middleX - 5,
+        middleY + multiplier * numberToMove  +4
       );
     }
     if (orientation === Orientation.VERTICAL) {
       canvasContext.fillText(
         `${this.size}`,
-        middleX + multiplier * numberToMove,
+        middleX + multiplier * numberToMove ,
         middleY + 4
       );
     }
     if (orientation === Orientation.ASCENDING) {
       canvasContext.fillText(
         `${this.size}`,
-        middleX - multiplier * numberToMove -6,
+        middleX - multiplier * numberToMove - 6,
         middleY - multiplier * numberToMove
       );
     }
