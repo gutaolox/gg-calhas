@@ -22,8 +22,8 @@ export const DrawArea = (props: DrawAreaProps) => {
     context.fillStyle = '#000000'; // Preto
     context.lineWidth = 3;
     context.font = "bold 16px Roboto";
-    let currentX = 375;
-    let currentY = 500;
+    let currentX = 330;
+    let currentY = 100;
     let currentAngle = 0;
     context.beginPath();
     for (const line of props.lines) {
@@ -59,8 +59,8 @@ export const DrawArea = (props: DrawAreaProps) => {
 
   return (
     <div style={{display:"flex",flexDirection:"column", alignItems:"center",justifyContent:"center", border:"1px"}}>
-      <canvas  ref={canvasRef} id="canvas" width="1000" height="700" />
-      <input style={{borderWidth:"10px",borderColor:"black"}} type="text" onChange={(e)=> {
+      <canvas  ref={canvasRef} id="canvas" width="1000" height="300" />
+      <input style={{ borderWidth:"10px",borderColor:"black"}} type="text" onChange={(e)=> {
         console.log(e.target.value)
         const newLines = props.lines.map((line, index) => {
           if(index === 2){
