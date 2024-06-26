@@ -15,7 +15,7 @@ export interface LineProps {
   displayAngle: boolean;
 }
 
-export const centimeterToPixelConversor = 20;
+
 
 const drawInfo = [
   {

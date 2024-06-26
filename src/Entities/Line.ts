@@ -1,7 +1,7 @@
-import { convertDeegreToRadian } from "@/util/convertDeegreToRadian";
+import { centimeterToPixelConversor, convertDeegreToRadian } from "@/util/convertDeegreToRadian";
 import { Draw } from "./Draw";
 import { Orientation } from "./Orientation";
-import { centimeterToPixelConversor } from "@/app/page";
+
 
 export class Line extends Draw {
   calculateNextPoint(

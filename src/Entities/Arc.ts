@@ -1,6 +1,6 @@
-import { convertDeegreToRadian } from "@/util/convertDeegreToRadian";
+import { centimeterToPixelConversor, convertDeegreToRadian } from "@/util/convertDeegreToRadian";
 import { Draw } from "./Draw";
-import { centimeterToPixelConversor } from "@/app/page";
+
 
 export class Arc extends Draw {
   calculateNextPoint(
