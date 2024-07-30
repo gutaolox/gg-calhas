@@ -16,12 +16,7 @@ export const DrawArea = (props: DrawAreaProps) => {
     if (!canvas) return;
     const context = canvas.getContext("2d");
     if (!context) return;
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = '#ffffff'; // Branco
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = '#000000'; // Preto
-    context.lineWidth = 3;
-    context.font = "bold 16px Roboto";
+    initialContextSetUp(context,canvas);
     let currentX = 330;
     let currentY = 100;
     let currentAngle = 0;
@@ -38,6 +33,15 @@ export const DrawArea = (props: DrawAreaProps) => {
     }
     context.stroke();
   }, [props.lines]);
+
+  const initialContextSetUp = (context: CanvasRenderingContext2D,canvas:HTMLCanvasElement) => {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = '#ffffff'; // Branco
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = '#000000'; // Preto
+    context.lineWidth = 3;
+    context.font = "bold 16px Roboto";
+  }
 
   const handleDownload = () => {
     const canvas = canvasRef.current;

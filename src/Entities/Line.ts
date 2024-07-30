@@ -1,25 +1,30 @@
 import {
   centimeterToPixelConversor,
+  convertRadianToDegree,
 } from "@/util/convertDeegreToRadian";
 import { Draw } from "./Draw";
 import { Orientation } from "./Orientation";
 
 export class Line extends Draw {
+  sizeControl = 1;
   calculateNextPoint(
     canvasContext: CanvasRenderingContext2D,
     radianAngle: number
   ): { newX: number; newY: number } {
     canvasContext.moveTo(this.initialX, this.initialY);
-    const newX =
-      this.initialX +
-      this.size * centimeterToPixelConversor * Math.cos(radianAngle);
-    const newY =
-      this.initialY -
-      this.size * centimeterToPixelConversor * Math.sin(radianAngle);
-    console.log("newX", newX);
-    console.log("newY", newY);
+    const { x: newX, y: newY } = this.findPoint(
+      { x: this.initialX, y: this.initialY },
+      this.convertSizerToPixel(this.size),
+      radianAngle
+    );
+
     canvasContext.lineTo(newX, newY);
-    this.printValue(canvasContext, newX, newY, (radianAngle * 180) / Math.PI);
+    this.printValue(
+      canvasContext,
+      newX,
+      newY,
+      convertRadianToDegree(radianAngle)
+    );
     return { newX, newY };
   }
 
@@ -36,23 +41,27 @@ export class Line extends Draw {
     const middleX = (this.initialX + newX) / 2;
     const middleY = (this.initialY + newY) / 2;
     if (orientation === Orientation.HORIZONTAL) {
+      const ditanceToLineAdditionOnX = -5 * this.sizeControl;
+      const ditanceToLineAdditionOnY = 4 * this.sizeControl;
       canvasContext.fillText(
         `${this.size}`,
-        middleX - 5,
-        middleY + multiplier * numberToMove  +4
+        middleX + ditanceToLineAdditionOnX,
+        middleY + multiplier * numberToMove + ditanceToLineAdditionOnY
       );
     }
     if (orientation === Orientation.VERTICAL) {
+      const ditanceToLineAddition = 4 * this.sizeControl;
       canvasContext.fillText(
         `${this.size}`,
-        middleX + multiplier * numberToMove ,
-        middleY + 4
+        middleX + multiplier * numberToMove,
+        middleY + ditanceToLineAddition
       );
     }
     if (orientation === Orientation.ASCENDING) {
+      const ditanceToLineAddition = -6 * this.sizeControl;
       canvasContext.fillText(
         `${this.size}`,
-        middleX - multiplier * numberToMove - 6,
+        middleX - multiplier * numberToMove + ditanceToLineAddition,
         middleY - multiplier * numberToMove
       );
     }
@@ -63,23 +72,6 @@ export class Line extends Draw {
         middleY + multiplier * numberToMove
       );
     }
-  }
-
-  getOrientation(currentAngle: number): Orientation {
-    const angle = currentAngle < 0 ? 360 + currentAngle : currentAngle;
-    if (angle === 0 || angle === 180) {
-      return Orientation.HORIZONTAL;
-    }
-    if (angle === 90 || angle === 270) {
-      return Orientation.VERTICAL;
-    }
-    if ((angle > 0 && angle < 90) || (angle > 180 && angle < 270)) {
-      return Orientation.ASCENDING;
-    }
-    if ((angle > 90 && angle < 180) || (angle > 270 && angle < 360)) {
-      return Orientation.DESCENDING;
-    }
-    return Orientation.HORIZONTAL;
   }
 
   printAngle(canvasContext: CanvasRenderingContext2D): void {
