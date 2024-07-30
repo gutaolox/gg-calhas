@@ -1,4 +1,5 @@
-import { convertDeegreToRadian } from "@/util/convertDeegreToRadian";
+import { centimeterToPixelConversor, convertDeegreToRadian } from "@/util/convertDeegreToRadian";
+import { Orientation } from "./Orientation";
 
 export abstract class Draw {
   public initialX = 0;
@@ -18,11 +19,7 @@ export abstract class Draw {
     canvasContext: CanvasRenderingContext2D,
     currentAngleReference: number
   ): { newX: number; newY: number; newAngle: number } {
-
-    console.log("initial x", this.initialX)
-    console.log("initia y", this.initialY)
     const angleCalculated = this.moveAngle(currentAngleReference);
-    console.log("current angle", angleCalculated)
     const newAngleInReadian = convertDeegreToRadian(angleCalculated);
     const { newX, newY } = this.calculateNextPoint(canvasContext, newAngleInReadian);
     
@@ -33,10 +30,48 @@ export abstract class Draw {
   }
   abstract calculateNextPoint(canvasContext: CanvasRenderingContext2D, radianAngle: number): { newX: number; newY: number };
   moveAngle(currentAngleReference: number): number {
-    const angleToSum = this.clockwise
-      ? this.angleToNextPoint - 180
-      : this.angleToNextPoint;
+    const angleToSum = this.targetedAngle(this.angleToNextPoint, this.clockwise);
     return currentAngleReference + angleToSum;
   }
+
+  targetedAngle(angle: number,orientation:boolean): number {
+    return orientation ? angle - 180 : angle;
+  }
+
+  findPoint(initialCoordinate:{
+    x:number,
+    y:number
+  }, sizeInPixels:number, radianAngle:number) : {
+    x:number,
+    y:number
+  } {
+    return {
+      x: initialCoordinate.x + sizeInPixels * Math.cos(radianAngle),
+      y: initialCoordinate.y - sizeInPixels * Math.sin(radianAngle)
+    }
+  }
+
+  convertSizerToPixel(sizeInCentimeters:number):number {
+    return sizeInCentimeters * centimeterToPixelConversor
+  }
+  
+  getOrientation(currentAngle: number): Orientation {
+    const angle = currentAngle < 0 ? 360 + currentAngle : currentAngle;
+    if (angle === 0 || angle === 180) {
+      return Orientation.HORIZONTAL;
+    }
+    if (angle === 90 || angle === 270) {
+      return Orientation.VERTICAL;
+    }
+    if ((angle > 0 && angle < 90) || (angle > 180 && angle < 270)) {
+      return Orientation.ASCENDING;
+    }
+    if ((angle > 90 && angle < 180) || (angle > 270 && angle < 360)) {
+      return Orientation.DESCENDING;
+    }
+    return Orientation.HORIZONTAL;
+  }
+
+
   abstract printAngle(canvasContext: CanvasRenderingContext2D): void;
 }
