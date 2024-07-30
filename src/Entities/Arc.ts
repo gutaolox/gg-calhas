@@ -21,7 +21,10 @@ export class Arc extends Draw {
     );
 
     const arcToAnngle = 360 * this.arcProportion;
-    const returningToPointAnglein =this.targetedAngle(arcToAnngle, !this.clockwise);
+    const returningToPointAnglein = this.targetedAngle(
+      arcToAnngle,
+      !this.clockwise
+    );
     const newAngleToRadian =
       convertDeegreToRadian(returningToPointAnglein) + radianAngle; // passar esse angulo pra printar
     // se for horario só subtrai e anti horario só soma o angulo
@@ -59,13 +62,15 @@ export class Arc extends Draw {
       (radius < distanceMinValue ? radius : distanceMinValue) *
         (this.textOnSum ? 1 : -1);
     let angleReference = (angle / 2) * (this.clockwise ? -1 : 1);
-    const orientation = this.getOrientation(convertRadianToDegree( angleReference));
-    
-    if(orientation === Orientation.ASCENDING){
-      angleReference = angleReference - Math.PI/2;
+    const orientation = this.getOrientation(
+      convertRadianToDegree(angleReference)
+    );
+
+    if (orientation === Orientation.ASCENDING) {
+      angleReference = angleReference - Math.PI / 2;
     }
-    if(orientation === Orientation.DESCENDING){
-      angleReference = angleReference + Math.PI/2;
+    if (orientation === Orientation.DESCENDING) {
+      angleReference = angleReference + Math.PI / 2;
     }
 
     const { x: printX, y: printY } = this.findPoint(
@@ -76,8 +81,6 @@ export class Arc extends Draw {
 
     canvasContext.fillText(`${this.size}`, printX, printY);
   }
-
-
 
   printAngle(canvasContext: CanvasRenderingContext2D): void {
     throw new Error("Method not implemented.");

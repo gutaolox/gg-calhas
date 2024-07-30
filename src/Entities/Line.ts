@@ -1,4 +1,7 @@
-import { centimeterToPixelConversor, convertRadianToDegree } from "@/util/convertDeegreToRadian";
+import {
+  centimeterToPixelConversor,
+  convertRadianToDegree,
+} from "@/util/convertDeegreToRadian";
 import { Draw } from "./Draw";
 import { Orientation } from "./Orientation";
 
@@ -16,7 +19,12 @@ export class Line extends Draw {
     );
 
     canvasContext.lineTo(newX, newY);
-    this.printValue(canvasContext, newX, newY, convertRadianToDegree(radianAngle));
+    this.printValue(
+      canvasContext,
+      newX,
+      newY,
+      convertRadianToDegree(radianAngle)
+    );
     return { newX, newY };
   }
 
@@ -65,8 +73,6 @@ export class Line extends Draw {
       );
     }
   }
-
-  
 
   printAngle(canvasContext: CanvasRenderingContext2D): void {
     throw new Error("Method not implemented.");

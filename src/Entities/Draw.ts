@@ -1,4 +1,7 @@
-import { centimeterToPixelConversor, convertDeegreToRadian } from "@/util/convertDeegreToRadian";
+import {
+  centimeterToPixelConversor,
+  convertDeegreToRadian,
+} from "@/util/convertDeegreToRadian";
 import { Orientation } from "./Orientation";
 
 export abstract class Draw {
@@ -21,40 +24,53 @@ export abstract class Draw {
   ): { newX: number; newY: number; newAngle: number } {
     const angleCalculated = this.moveAngle(currentAngleReference);
     const newAngleInReadian = convertDeegreToRadian(angleCalculated);
-    const { newX, newY } = this.calculateNextPoint(canvasContext, newAngleInReadian);
-    
+    const { newX, newY } = this.calculateNextPoint(
+      canvasContext,
+      newAngleInReadian
+    );
+
     if (this.displayAngle) {
       this.printAngle(canvasContext);
     }
     return { newX, newY, newAngle: angleCalculated };
   }
-  abstract calculateNextPoint(canvasContext: CanvasRenderingContext2D, radianAngle: number): { newX: number; newY: number };
+  abstract calculateNextPoint(
+    canvasContext: CanvasRenderingContext2D,
+    radianAngle: number
+  ): { newX: number; newY: number };
   moveAngle(currentAngleReference: number): number {
-    const angleToSum = this.targetedAngle(this.angleToNextPoint, this.clockwise);
+    const angleToSum = this.targetedAngle(
+      this.angleToNextPoint,
+      this.clockwise
+    );
     return currentAngleReference + angleToSum;
   }
 
-  targetedAngle(angle: number,orientation:boolean): number {
+  targetedAngle(angle: number, orientation: boolean): number {
     return orientation ? angle - 180 : angle;
   }
 
-  findPoint(initialCoordinate:{
-    x:number,
-    y:number
-  }, sizeInPixels:number, radianAngle:number) : {
-    x:number,
-    y:number
+  findPoint(
+    initialCoordinate: {
+      x: number;
+      y: number;
+    },
+    sizeInPixels: number,
+    radianAngle: number
+  ): {
+    x: number;
+    y: number;
   } {
     return {
       x: initialCoordinate.x + sizeInPixels * Math.cos(radianAngle),
-      y: initialCoordinate.y - sizeInPixels * Math.sin(radianAngle)
-    }
+      y: initialCoordinate.y - sizeInPixels * Math.sin(radianAngle),
+    };
   }
 
-  convertSizerToPixel(sizeInCentimeters:number):number {
-    return sizeInCentimeters * centimeterToPixelConversor
+  convertSizerToPixel(sizeInCentimeters: number): number {
+    return sizeInCentimeters * centimeterToPixelConversor;
   }
-  
+
   getOrientation(currentAngle: number): Orientation {
     const angle = currentAngle < 0 ? 360 + currentAngle : currentAngle;
     if (angle === 0 || angle === 180) {
@@ -71,7 +87,6 @@ export abstract class Draw {
     }
     return Orientation.HORIZONTAL;
   }
-
 
   abstract printAngle(canvasContext: CanvasRenderingContext2D): void;
 }
