@@ -26,7 +26,7 @@ const drawInfo = [
         //somar angulo antes de somar
         size: 1,
         angleToNextPoint: 0,
-        clockwise: false, // antiohorario somar o angulo atual com angulo -180 e sentido horario só somar o angulo
+        clockwise: true, // antiohorario somar o angulo atual com angulo -180 e sentido horario só somar o angulo
         isArc: false, //quando for arco adicionar o raio no display do texto dependendo da combinação de textOnSum e clockwise
         arcProportion: 0, //para achar o centro do circulo soma o raio na mesma direção pra achar o centro
         textOnSum: true,
@@ -39,7 +39,7 @@ const drawInfo = [
         isArc: false,
         arcProportion: 0,
         textOnSum: false,
-        displayAngle: false,
+        displayAngle: true,
       },
       {
         size: 10,
@@ -48,7 +48,7 @@ const drawInfo = [
         isArc: false,
         arcProportion: 0,
         textOnSum: true,
-        displayAngle: false,
+        displayAngle: true,
       },
       {
         size: 2,
@@ -57,12 +57,12 @@ const drawInfo = [
         isArc: false,
         arcProportion: 0,
         textOnSum: true,
-        displayAngle: false,
+        displayAngle: true,
       },
       {
         size: 6.5,
         angleToNextPoint: 0,
-        clockwise: false,
+        clockwise: true,
         isArc: true,
         arcProportion: 0.25,
         textOnSum: true,
@@ -70,7 +70,7 @@ const drawInfo = [
       },
       {
         size: 2,
-        angleToNextPoint: 120,
+        angleToNextPoint: 60,
         clockwise: true,
         isArc: false,
         arcProportion: 0,
@@ -79,12 +79,12 @@ const drawInfo = [
       },
       {
         size: 2.5,
-        angleToNextPoint: 60,
+        angleToNextPoint: 120,
         clockwise: false,
         isArc: false,
         arcProportion: 0,
         textOnSum: true,
-        displayAngle: false,
+        displayAngle: true,
       },
       {
         size: 1,
@@ -93,7 +93,7 @@ const drawInfo = [
         isArc: false,
         arcProportion: 0,
         textOnSum: false,
-        displayAngle: false,
+        displayAngle: true,
       },
       {
         size: 1,
@@ -102,7 +102,7 @@ const drawInfo = [
         isArc: false,
         arcProportion: 0,
         textOnSum: false,
-        displayAngle: false,
+        displayAngle: true,
       },
     ],
   },

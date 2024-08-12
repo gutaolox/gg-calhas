@@ -5,15 +5,17 @@ import {
 } from "@/util/convertDeegreToRadian";
 import { Draw } from "./Draw";
 import { Orientation } from "./Orientation";
+import { LineProps } from "@/app/page";
 
 export class Arc extends Draw {
+
+
   calculateNextPoint(
     canvasContext: CanvasRenderingContext2D,
     radianAngle: number
   ): { newX: number; newY: number } {
     const radius =
       this.convertSizerToPixel(this.size) / this.arcProportion / (2 * Math.PI);
-
     const { x: newX, y: newY } = this.findPoint(
       { x: this.initialX, y: this.initialY },
       radius,
@@ -23,7 +25,7 @@ export class Arc extends Draw {
     const arcToAnngle = 360 * this.arcProportion;
     const returningToPointAnglein = this.targetedAngle(
       arcToAnngle,
-      !this.clockwise
+      this.clockwise
     );
     const newAngleToRadian =
       convertDeegreToRadian(returningToPointAnglein) + radianAngle; // passar esse angulo pra printar
@@ -32,17 +34,17 @@ export class Arc extends Draw {
       { x: newX, y: newY },
       radius,
       newAngleToRadian
-    );
+    );    
 
     canvasContext.moveTo(finalX, finalY);
-    const proportionRadianAngle = 2 * Math.PI * this.arcProportion;
+    const proportionRadianAngle = 2 * Math.PI * this.arcProportion
     canvasContext.arc(
       newX,
       newY,
       radius,
-      0,
-      proportionRadianAngle,
-      this.clockwise
+      newAngleToRadian ,
+      radianAngle-Math.PI,
+      !this.clockwise
     );
     this.printValue(canvasContext, newX, newY, radius, proportionRadianAngle);
 
