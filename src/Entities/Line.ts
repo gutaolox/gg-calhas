@@ -12,23 +12,24 @@ export class Line extends Draw {
 
   calculateNextPoint(
     canvasContext: CanvasRenderingContext2D,
-    radianAngle: number
+    radianAngle: number,
+    initialPoint: { x: number; y: number }
   ): { newX: number; newY: number } {
+    canvasContext.moveTo(initialPoint.x, initialPoint.y);
     const { x: newX, y: newY } = this.findPoint(
-      { x: this.initialX, y: this.initialY },
+      { x: initialPoint.x, y: initialPoint.y },
       this.convertSizerToPixel(this.size),
       radianAngle
     );
 
-    this.rotateImage(canvasContext, this.initialX, this.initialY);
-    canvasContext.moveTo(this.initialX, this.initialY);
     canvasContext.lineTo(newX, newY);
-    
+
     this.printValue(
       canvasContext,
       newX,
       newY,
-      convertRadianToDegree(radianAngle)
+      convertRadianToDegree(radianAngle),
+      initialPoint
     );
     return { newX, newY };
   }
@@ -37,15 +38,15 @@ export class Line extends Draw {
     canvasContext: CanvasRenderingContext2D,
     newX: number,
     newY: number,
-    angle: number
+    angle: number,
+    initialPoint: { x: number; y: number }
   ): void {
     const orientation = this.getOrientation(angle);
     const multiplier = this.textOnSum ? 1 : -1;
     const numberToMove = 12;
 
-    const middleX = (this.initialX + newX) / 2;
-    const middleY = (this.initialY + newY) / 2;
-    //this.rotateImage(canvasContext, middleX, middleY);
+    const middleX = (initialPoint.x + newX) / 2;
+    const middleY = (initialPoint.y + newY) / 2;
     if (orientation === Orientation.HORIZONTAL) {
       const ditanceToLineAdditionOnX = -5 * this.sizeControl;
       const ditanceToLineAdditionOnY = 4 * this.sizeControl;
@@ -83,15 +84,16 @@ export class Line extends Draw {
   printAngle(
     canvasContext: CanvasRenderingContext2D,
     oldAngleNumber: number,
-    angleCalculated: number
+    angleCalculated: number,
+    initialPoint: { x: number; y: number }
   ): void {
-    canvasContext.moveTo(this.initialX, this.initialY);
+    canvasContext.moveTo(initialPoint.x, initialPoint.y);
 
     const initalAngleRadian = convertDeegreToRadian(angleCalculated);
     const endAngleRadian = convertDeegreToRadian(oldAngleNumber - 180);
     canvasContext.arc(
-      this.initialX,
-      this.initialY,
+      initialPoint.x,
+      initialPoint.y,
       10,
       initalAngleRadian,
       endAngleRadian,

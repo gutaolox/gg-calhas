@@ -16,8 +16,9 @@ export class Arc extends Draw {
   ): { newX: number; newY: number } {
     const radius =
       this.convertSizerToPixel(this.size) / this.arcProportion / (2 * Math.PI);
+    const initiaPoint = this.getInitialPoint();
     const { x: newX, y: newY } = this.findPoint(
-      { x: this.initialX, y: this.initialY },
+      { x: initiaPoint.x, y: initiaPoint.y },
       radius,
       radianAngle
     );

@@ -1,3 +1,4 @@
+import { DoublyLinkedList } from "@/Entities/BaseStructures/DoublyLinkedList";
 import { Draw } from "@/Entities/Draw";
 import { convertDeegreToRadian } from "@/util/convertDeegreToRadian";
 import { useEffect, useRef, useState } from "react";
@@ -5,51 +6,141 @@ import { useEffect, useRef, useState } from "react";
 export interface DrawAreaProps {
   name: string;
   code: string;
-  lines: Draw[];
-  setLines: (lines: Draw[]) => void;
+  lines: DoublyLinkedList<Draw>;
+  setLines: (lines: DoublyLinkedList<Draw>) => void;
 }
+//Função so pra direita
 
+//Função que vai pros dois lados bem implementada, com o que foi pensado as 16:26 de 24 de agosto SO PRECISA INVERTER O ANGULO INICIAL
 export const DrawArea = (props: DrawAreaProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [lastLineChanged, setLastLineChanged] = useState<Draw>();
+  const [angle, setAngle] = useState(90);
+  const toRightDraw = (
+    initialXOnDraw: number,
+    initialYOnDraw: number,
+    angleOnDraw: number,
+    context: CanvasRenderingContext2D
+  ) => {
+    let currentX = initialXOnDraw; // Fazer uma função que recebe por parametro
+    let currentY = initialYOnDraw;
+    let currentAngle = angleOnDraw;
+    return (line: Draw | null) => {
+      if (!line) return;
+      line.setInitialPoint(currentX, currentY);
+      line.setAngleOnDraw(currentAngle);
+      const drawData = line.drawLeftToRight(context, currentAngle);
+      currentX = drawData.newX;
+      currentY = drawData.newY;
+      line.setFinalPoint(currentX, currentY);
+      currentAngle = drawData.newAngle;
+    };
+  };
+
+  const toLeftDraw = (
+    initialXOnDraw: number,
+    initialYOnDraw: number,
+    angleOnDraw: number,
+    context: CanvasRenderingContext2D
+  ) => {
+    let currentX = initialXOnDraw; // Fazer uma função que recebe por parametro
+    let currentY = initialYOnDraw;
+    let currentAngle = angleOnDraw;
+    return (line: Draw | null) => {
+      if (!line) return;
+      line.setFinalPoint(currentX, currentY);
+      line.setAngleOnDraw(currentAngle);
+      const drawData = line.drawRightToLeft(context, currentAngle);
+      line.setInitialPoint(currentX, currentY);
+      currentX = drawData.newX;
+      currentY = drawData.newY;
+      currentAngle = drawData.newAngle;
+    };
+  };
+
+  const onAngleChange = (line: Draw, context: CanvasRenderingContext2D) => {
+    const seyUpPositions = line.moveRightSide ? line.getInitialPoint() : line.getFinalPoint() ;
+    console.log(line);
+    const rightFunction = toRightDraw(
+      seyUpPositions.x,
+      seyUpPositions.y,
+      line.getAngleOnDraw(),
+      context
+    );
+
+    const leftFunction = toLeftDraw(
+      seyUpPositions.x,
+      seyUpPositions.y,
+      line.getAngleOnDraw(),
+      context
+    );
+
+    props.lines.travelFrom(
+      line.idToList!,
+      (data: Draw | null) => {
+        if (data !== line || line.moveRightSide) {
+          console.log(line.idToList);
+          rightFunction(data);
+        }
+      },
+      (data: Draw | null) => {
+        if (data !== line || !line.moveRightSide) {
+          console.log(line.idToList);
+          leftFunction(data);
+        }
+      }
+    );
+  };
+
   useEffect(() => {
+    console.log(props.lines);
+    let currentX = 330; // Fazer uma função que recebe por parametro
+    let currentY = 100;
+    let currentAngle = 0;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const context = canvas.getContext("2d");
     if (!context) return;
-    initialContextSetUp(context, canvas);
-    let currentX = 330;
-    let currentY = 100;
-    let currentAngle = 0;
+    initialContextSetUp(canvas, context);
+
     context.beginPath();
-    for (const index in props.lines) {
-      const line = props.lines[index];
-      line.initialX = currentX;
-      line.initialY = currentY;
-
-      const drawData = line.draw(context, currentAngle);
-
-      currentX = drawData.newX;
-      currentY = drawData.newY;
-      line.finalX = currentX;
-      line.finalY = currentY;
-      currentAngle = drawData.newAngle;
-    }
-
+    const initialDrawFunction = toRightDraw(
+      currentX,
+      currentY,
+      currentAngle,
+      context
+    );
+    //adicionar função do loop como parametro
+    props.lines.travel(initialDrawFunction);
+    context.closePath();
     context.stroke();
-  }, [props.lines]);
+  }, []);
+
+  useEffect(() => {
+    if (!lastLineChanged) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.beginPath();
+    initialContextSetUp(canvas, context);
+    onAngleChange(lastLineChanged, context);
+    context.closePath();
+    context.stroke();
+  }, [angle]);
 
   const initialContextSetUp = (
-    context: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement
-  ) => {
-    context.clearRect(-2* canvas.width, -2*canvas.height, 4*canvas.width, 4*canvas.height);
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D | undefined => {
+    context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = "#ffffff"; // Branco
     context.fillRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = "#000000"; // Preto
-    context.rect(0, 0, canvas.width, canvas.height);
+    context.strokeRect(0, 0, canvas.width, canvas.height);
     context.lineWidth = 3;
     context.font = "bold 16px Roboto";
-    context.save();
+    return context;
   };
 
   const handleDownload = () => {
@@ -85,19 +176,22 @@ export const DrawArea = (props: DrawAreaProps) => {
         type="number"
         defaultValue={90}
         onChange={(e) => {
+          console.log(props.lines);
           const valueInNumber = parseFloat(e.target.value || "90");
-          const newLines = props.lines.map((line, index) => {
-            const angleDiff =
-              valueInNumber -
-              (line.angleToNextPoint + line.totalAddtionalAngle);
-            if (index === 2) {
-              line.totalAddtionalAngle += angleDiff;
-              line.currentAngleDiff = angleDiff;
-            }
-            return line;
-          });
+          const newLine = props.lines.search(2)!.data;
+          const angleDiff =
+            valueInNumber -
+            (newLine.angleToNextPoint + newLine.totalAddtionalAngle);
 
-          props.setLines(newLines);
+          newLine.totalAddtionalAngle += angleDiff;
+          newLine.currentAngleDiff = angleDiff;
+
+          // newLine?.setAngleOnDraw(
+          //   newLine.getAngleOnDraw() + newLine.totalAddtionalAngle
+          // );
+          setLastLineChanged(newLine);
+          setAngle(valueInNumber);
+          // props.setLines(props.lines);
         }}
       />
       <button

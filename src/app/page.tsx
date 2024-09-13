@@ -1,9 +1,10 @@
-"use client"
+"use client";
 import { DrawArea } from "@/DrawArea/DrawArea";
 import { Arc } from "@/Entities/Arc";
+import { DoublyLinkedList } from "@/Entities/BaseStructures/DoublyLinkedList";
 import { Draw } from "@/Entities/Draw";
 import { Line } from "@/Entities/Line";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 
 export interface LineProps {
   size: number;
@@ -14,9 +15,7 @@ export interface LineProps {
   textOnSum: boolean;
   displayAngle: boolean;
 }
-
-
-
+let count = 0;
 const drawInfo = [
   {
     name: "Calhador",
@@ -109,11 +108,12 @@ const drawInfo = [
 ];
 
 export default function Home() {
-  const [lines, setLines] = useState<Draw[]>(
-    drawInfo[0].lines.map((line) =>
-      line.isArc
+  const [lines, setLines] = useState<DoublyLinkedList<Draw>>(() => {
+    const initiLines = new DoublyLinkedList<Draw>();
+    drawInfo[0].lines.forEach((line) => {
+      const selectedObj = line.isArc
         ? new Arc(
-            line.size ,
+            line.size,
             line.angleToNextPoint,
             line.clockwise,
             line.arcProportion,
@@ -127,12 +127,21 @@ export default function Home() {
             line.arcProportion,
             line.textOnSum,
             line.displayAngle
-          )
-    )
-  );
+          );
+      console.log(count);
+      count++;
+      initiLines.append(selectedObj);
+    });
+    return initiLines;
+  });
   return (
     <div>
-      <DrawArea name={drawInfo[0].name} code={drawInfo[0].code} lines={lines} setLines={setLines} />
+      <DrawArea
+        name={drawInfo[0].name}
+        code={drawInfo[0].code}
+        lines={lines}
+        setLines={setLines}
+      />
     </div>
   );
 }

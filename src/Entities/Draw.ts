@@ -3,16 +3,17 @@ import {
   convertDeegreToRadian,
 } from "@/util/convertDeegreToRadian";
 import { Orientation } from "./Orientation";
+import { BaseDataInterface } from "./BaseStructures/DoublyLinkedList";
 
-export abstract class Draw {
-  public initialX = 0;
-  public initialY = 0;
-  public finalX = 0;
-  public finalY = 0;
+export abstract class Draw implements BaseDataInterface {
+  private initialX = 0;
+  private initialY = 0;
+  private finalX = 0;
+  private finalY = 0;
+  private angleOnDraw = 0;
+  public moveRightSide = false;
   public totalAddtionalAngle = 0;
   public currentAngleDiff = 0;
-  public isNextFixed = true;
-
   constructor(
     public size: number,
     public angleToNextPoint: number,
@@ -21,39 +22,116 @@ export abstract class Draw {
     public textOnSum: boolean,
     public displayAngle: boolean,
     public nextDraw: Draw | null = null,
-    public previousDraw: Draw | null = null
+    public previousDraw: Draw | null = null,
+    public idToList?: number
   ) {}
 
-  draw(
+  setInitialPoint(x: number, y: number): void {
+    this.initialX = x;
+    this.initialY = y;
+  }
+
+  getInitialPoint(): { x: number; y: number } {
+    return { x: this.initialX, y: this.initialY };
+  }
+
+  setFinalPoint(x: number, y: number): void {
+    this.finalX = x;
+    this.finalY = y;
+  }
+
+  getFinalPoint(): { x: number; y: number } {
+    return { x: this.finalX, y: this.finalY };
+  }
+
+  setAngleOnDraw(angle: number): void {
+    this.angleOnDraw = angle;
+  }
+
+  getAngleOnDraw(): number {
+    return this.angleOnDraw;
+  }
+
+  drawLeftToRight(
     canvasContext: CanvasRenderingContext2D,
-    currentAngleReference: number
+    currentAngleReference: number,
+    multiplier = 1
   ): { newX: number; newY: number; newAngle: number } {
-    const angleCalculated = this.moveAngle(currentAngleReference);
-    
+    console.log("currentAngleReference", currentAngleReference);
+
+    const angleCalculated = this.moveAngle(
+      currentAngleReference,
+      this.clockwise,
+      multiplier
+    );
+    console.log("angleCalculated", angleCalculated);
     const newAngleInReadian = convertDeegreToRadian(angleCalculated);
-   
+
     const { newX, newY } = this.calculateNextPoint(
       canvasContext,
-      newAngleInReadian
+      newAngleInReadian,
+      { x: this.initialX, y: this.initialY }
     );
+    //console.log("newX", newX, "newY", newY);
 
     if (this.displayAngle) {
-      this.printAngle(canvasContext, currentAngleReference, angleCalculated);
+      this.printAngle(
+        canvasContext,
+        currentAngleReference,
+        angleCalculated,
+        this.getInitialPoint()
+      );
     }
     return { newX, newY, newAngle: angleCalculated };
   }
-  abstract calculateNextPoint(
-    canvasContext: CanvasRenderingContext2D,
-    radianAngle: number
-  ): { newX: number; newY: number };
 
-  moveAngle(currentAngleReference: number): number {
-    const angleToSum = this.targetedAngle(
-      this.angleToNextPoint + this.totalAddtionalAngle,
-      this.clockwise
+  drawRightToLeft(
+    canvasContext: CanvasRenderingContext2D,
+    currentAngleReference: number
+  ) {
+    console.log("currentAngleReference", currentAngleReference);
+    const newAngleInReadian = convertDeegreToRadian(
+      currentAngleReference - 180
     );
 
-    return currentAngleReference + angleToSum;
+    const { newX, newY } = this.calculateNextPoint(
+      canvasContext,
+      newAngleInReadian,
+      { x: this.finalX, y: this.finalY }
+    );
+
+    const angleCalculated = this.moveAngle(
+      currentAngleReference,
+      this.clockwise,
+      -1
+    );
+
+    if (this.displayAngle) {
+      this.printAngle(canvasContext, angleCalculated, currentAngleReference, {
+        x: newX,
+        y: newY,
+      });
+    }
+
+    return { newX, newY, newAngle: angleCalculated };
+  }
+
+  abstract calculateNextPoint(
+    canvasContext: CanvasRenderingContext2D,
+    radianAngle: number,
+    initialPoint: { x: number; y: number }
+  ): { newX: number; newY: number };
+
+  moveAngle(
+    currentAngleReference: number,
+    clockwise: boolean,
+    multiplier = 1
+  ): number {
+    const angleToSum = this.targetedAngle(
+      this.angleToNextPoint + this.totalAddtionalAngle,
+      clockwise
+    );
+    return currentAngleReference + angleToSum * multiplier;
   }
 
   targetedAngle(angle: number, orientation: boolean): number {
@@ -141,20 +219,12 @@ export abstract class Draw {
     );
   }
 
-  abstract printAngle(
+  printAngle(
     canvasContext: CanvasRenderingContext2D,
     oldAngleNumber: number,
-    angleCalculated: number
-  ): void;
-
-  rotateImage(canvasContext: CanvasRenderingContext2D, x: number, y: number) {
-    if (this.isNextFixed) {
-      canvasContext.translate(x, y);
-      const angleToRotateInRadian = convertDeegreToRadian(
-        -this.currentAngleDiff
-      );
-      canvasContext.rotate(angleToRotateInRadian);
-      canvasContext.translate(-x, -y);
-    }
+    angleCalculated: number,
+    initialPoint: { x: number; y: number }
+  ): void {
+    // implementation goes here
   }
 }
