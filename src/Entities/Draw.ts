@@ -11,7 +11,7 @@ export abstract class Draw implements BaseDataInterface {
   private finalX = 0;
   private finalY = 0;
   private angleOnDraw = 0;
-  public moveRightSide = false;
+  public moveRightSide = true;
   public totalAddtionalAngle = 0;
   public currentAngleDiff = 0;
   constructor(
@@ -105,6 +105,7 @@ export abstract class Draw implements BaseDataInterface {
       this.clockwise,
       -1
     );
+    console.log("angleCalculated", angleCalculated);
 
     if (this.displayAngle) {
       this.printAngle(canvasContext, angleCalculated, currentAngleReference, {

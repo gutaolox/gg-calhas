@@ -2,7 +2,7 @@ export interface BaseDataInterface {
   idToList?: number;
 }
 
-class Nod<T extends BaseDataInterface> {
+export class Nod<T extends BaseDataInterface> {
   data: T;
   next: Nod<T> | null;
   prev: Nod<T> | null;

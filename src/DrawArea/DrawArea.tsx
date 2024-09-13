@@ -1,4 +1,7 @@
-import { DoublyLinkedList } from "@/Entities/BaseStructures/DoublyLinkedList";
+import {
+  DoublyLinkedList,
+  Nod,
+} from "@/Entities/BaseStructures/DoublyLinkedList";
 import { Draw } from "@/Entities/Draw";
 import { convertDeegreToRadian } from "@/util/convertDeegreToRadian";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +17,7 @@ export interface DrawAreaProps {
 //Função que vai pros dois lados bem implementada, com o que foi pensado as 16:26 de 24 de agosto SO PRECISA INVERTER O ANGULO INICIAL
 export const DrawArea = (props: DrawAreaProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [lastLineChanged, setLastLineChanged] = useState<Draw>();
+  const [lastLineChanged, setLastLineChanged] = useState<Nod<Draw>>();
   const [angle, setAngle] = useState(90);
   const toRightDraw = (
     initialXOnDraw: number,
@@ -28,8 +31,8 @@ export const DrawArea = (props: DrawAreaProps) => {
     return (line: Draw | null) => {
       if (!line) return;
       line.setInitialPoint(currentX, currentY);
-      line.setAngleOnDraw(currentAngle);
       const drawData = line.drawLeftToRight(context, currentAngle);
+      line.setAngleOnDraw(drawData.newAngle);
       currentX = drawData.newX;
       currentY = drawData.newY;
       line.setFinalPoint(currentX, currentY);
@@ -57,35 +60,68 @@ export const DrawArea = (props: DrawAreaProps) => {
       currentAngle = drawData.newAngle;
     };
   };
+  const getPositionInfo = (line: Nod<Draw>, chossePrev: boolean) => {
+    return chossePrev ? line.prev : line;
+  };
 
-  const onAngleChange = (line: Draw, context: CanvasRenderingContext2D) => {
-    const seyUpPositions = line.moveRightSide ? line.getInitialPoint() : line.getFinalPoint() ;
+  const onAngleChange = (
+    line: Nod<Draw>,
+    context: CanvasRenderingContext2D
+  ) => {
+    const dataLine = line.data;
+    // const setUpPositions = line.moveRightSide
+    //   ? line.getInitialPoint()
+    //   : line.getFinalPoint();
+    if (!line.next || !line.prev) return;
+    const leftToRightInfo = dataLine.moveRightSide
+      ? {
+          x: line.prev.data.getFinalPoint().x,
+          y: line.prev.data.getFinalPoint().y,
+          angle: line.prev.data.getAngleOnDraw(),
+        }
+      : {
+          x: dataLine.getFinalPoint().x,
+          y: dataLine.getFinalPoint().y,
+          angle: dataLine.getAngleOnDraw(),
+        };
+    const rightToLeftInfo = dataLine.moveRightSide
+      ? {
+          x: line.prev.data.getFinalPoint().x,
+          y: line.prev.data.getFinalPoint().y,
+          angle: line.prev.data.getAngleOnDraw(),
+        }
+      : {
+          x: dataLine.getFinalPoint().x,
+          y: dataLine.getFinalPoint().y,
+          angle: dataLine.getAngleOnDraw(),
+        };
+    
     console.log(line);
     const rightFunction = toRightDraw(
-      seyUpPositions.x,
-      seyUpPositions.y,
-      line.getAngleOnDraw(),
+      leftToRightInfo.x,
+      leftToRightInfo.y,
+      leftToRightInfo.angle,
       context
     );
 
     const leftFunction = toLeftDraw(
-      seyUpPositions.x,
-      seyUpPositions.y,
-      line.getAngleOnDraw(),
+      rightToLeftInfo.x,
+      rightToLeftInfo.y,
+      rightToLeftInfo.angle,
       context
     );
 
     props.lines.travelFrom(
-      line.idToList!,
+      dataLine.idToList!,
       (data: Draw | null) => {
-        if (data !== line || line.moveRightSide) {
-          console.log(line.idToList);
+        if (data !== dataLine || dataLine.moveRightSide) {
+          console.log(data?.idToList);
           rightFunction(data);
         }
       },
       (data: Draw | null) => {
-        if (data !== line || !line.moveRightSide) {
-          console.log(line.idToList);
+        if (data !== dataLine || !dataLine.moveRightSide) {
+          console.log(data?.idToList);
           leftFunction(data);
         }
       }
@@ -178,7 +214,8 @@ export const DrawArea = (props: DrawAreaProps) => {
         onChange={(e) => {
           console.log(props.lines);
           const valueInNumber = parseFloat(e.target.value || "90");
-          const newLine = props.lines.search(2)!.data;
+          const lineNod = props.lines.search(2)!.nod;
+          const newLine = lineNod.data;
           const angleDiff =
             valueInNumber -
             (newLine.angleToNextPoint + newLine.totalAddtionalAngle);
@@ -189,7 +226,7 @@ export const DrawArea = (props: DrawAreaProps) => {
           // newLine?.setAngleOnDraw(
           //   newLine.getAngleOnDraw() + newLine.totalAddtionalAngle
           // );
-          setLastLineChanged(newLine);
+          setLastLineChanged(lineNod);
           setAngle(valueInNumber);
           // props.setLines(props.lines);
         }}
