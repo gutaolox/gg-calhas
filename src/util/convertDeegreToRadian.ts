@@ -6,4 +6,4 @@ export function convertRadianToDegree(radian: number): number {
   return (radian * 180) / Math.PI
 }
 
-export const centimeterToPixelConversor = 20;
+export const centimeterToPixelConversor = 100;

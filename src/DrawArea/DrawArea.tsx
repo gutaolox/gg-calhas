@@ -60,9 +60,6 @@ export const DrawArea = (props: DrawAreaProps) => {
       currentAngle = drawData.newAngle;
     };
   };
-  const getPositionInfo = (line: Nod<Draw>, chossePrev: boolean) => {
-    return chossePrev ? line.prev : line;
-  };
 
   const onAngleChange = (
     line: Nod<Draw>,
@@ -95,8 +92,6 @@ export const DrawArea = (props: DrawAreaProps) => {
           y: dataLine.getFinalPoint().y,
           angle: dataLine.getAngleOnDraw(),
         };
-    
-    console.log(line);
     const rightFunction = toRightDraw(
       leftToRightInfo.x,
       leftToRightInfo.y,
@@ -115,23 +110,20 @@ export const DrawArea = (props: DrawAreaProps) => {
       dataLine.idToList!,
       (data: Draw | null) => {
         if (data !== dataLine || dataLine.moveRightSide) {
-          console.log(data?.idToList);
           rightFunction(data);
         }
       },
       (data: Draw | null) => {
         if (data !== dataLine || !dataLine.moveRightSide) {
-          console.log(data?.idToList);
           leftFunction(data);
         }
       }
     );
   };
 
-  useEffect(() => {
-    console.log(props.lines);
-    let currentX = 330; // Fazer uma função que recebe por parametro
-    let currentY = 100;
+  useEffect(() => {    
+    let currentX = 1500; // Fazer uma função que recebe por parametro
+    let currentY = 1500;
     let currentAngle = 0;
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -206,15 +198,14 @@ export const DrawArea = (props: DrawAreaProps) => {
         border: "1px",
       }}
     >
-      <canvas ref={canvasRef} id="canvas" width="1000" height="300" />
+      <canvas ref={canvasRef} id="canvas" width="4000" height="2500" />
       <input
         style={{ borderWidth: "10px", borderColor: "black" }}
         type="number"
-        defaultValue={90}
+        defaultValue={120}
         onChange={(e) => {
-          console.log(props.lines);
-          const valueInNumber = parseFloat(e.target.value || "90");
-          const lineNod = props.lines.search(2)!.nod;
+          const valueInNumber = parseFloat(e.target.value || "120");
+          const lineNod = props.lines.search(6)!.nod;
           const newLine = lineNod.data;
           const angleDiff =
             valueInNumber -

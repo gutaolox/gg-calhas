@@ -93,7 +93,6 @@ export class DoublyLinkedList<T extends BaseDataInterface> {
       currentNode = currentNode.next;
     }
     result += "null";
-    console.log(result);
   }
 
   travelReverse(action: (data: T | null) => void): void {
@@ -127,7 +126,6 @@ export class DoublyLinkedList<T extends BaseDataInterface> {
       tempNode = tempNode.next;
     }
     forwardResult += "null";
-    console.log("Forward: " + forwardResult);
 
     // Display backward from the found node
     let backwardResult = "";
@@ -138,18 +136,6 @@ export class DoublyLinkedList<T extends BaseDataInterface> {
       tempNode = tempNode.prev;
     }
     backwardResult += "null";
-    console.log("Backward: " + backwardResult);
   }
 }
-
-// Exemplo de uso
-// const dll = new DoublyLinkedList<number>();
-// dll.append(1);
-// dll.append(2);
-// dll.append(3);
-// dll.append(4);
-// dll.append(5);
-// dll.display();  // Output: 1 <-> 2 <-> 3 <-> 4 <-> 5 <-> null
-// dll.displayReverse();  // Output: 5 <-> 4 <-> 3 <-> 2 <-> 1 <-> null
-// dll.displayFrom(3);  // Output: Forward: 3 <-> 4 <-> 5 <-> null
-//                     //         Backward: 3 <-> 2 <-> 1 <-> null
+                 //         Backward: 3 <-> 2 <-> 1 <-> null

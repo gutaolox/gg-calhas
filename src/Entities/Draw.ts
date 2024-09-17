@@ -4,6 +4,7 @@ import {
 } from "@/util/convertDeegreToRadian";
 import { Orientation } from "./Orientation";
 import { BaseDataInterface } from "./BaseStructures/DoublyLinkedList";
+import { Arc } from "./Arc";
 
 export abstract class Draw implements BaseDataInterface {
   private initialX = 0;
@@ -11,7 +12,7 @@ export abstract class Draw implements BaseDataInterface {
   private finalX = 0;
   private finalY = 0;
   private angleOnDraw = 0;
-  public moveRightSide = true;
+  public moveRightSide = false;
   public totalAddtionalAngle = 0;
   public currentAngleDiff = 0;
   constructor(
@@ -58,13 +59,11 @@ export abstract class Draw implements BaseDataInterface {
     multiplier = 1
   ): { newX: number; newY: number; newAngle: number } {
     console.log("currentAngleReference", currentAngleReference);
-
     const angleCalculated = this.moveAngle(
       currentAngleReference,
       this.clockwise,
       multiplier
     );
-    console.log("angleCalculated", angleCalculated);
     const newAngleInReadian = convertDeegreToRadian(angleCalculated);
 
     const { newX, newY } = this.calculateNextPoint(
@@ -72,7 +71,6 @@ export abstract class Draw implements BaseDataInterface {
       newAngleInReadian,
       { x: this.initialX, y: this.initialY }
     );
-    //console.log("newX", newX, "newY", newY);
 
     if (this.displayAngle) {
       this.printAngle(
@@ -89,14 +87,15 @@ export abstract class Draw implements BaseDataInterface {
     canvasContext: CanvasRenderingContext2D,
     currentAngleReference: number
   ) {
-    console.log("currentAngleReference", currentAngleReference);
     const newAngleInReadian = convertDeegreToRadian(
       currentAngleReference - 180
     );
-
+    console.log(this instanceof Arc)
+    console.log("currentAngleReference", currentAngleReference);
+    console.log("size", this.angleToNextPoint);
     const { newX, newY } = this.calculateNextPoint(
       canvasContext,
-      newAngleInReadian,
+      newAngleInReadian ,
       { x: this.finalX, y: this.finalY }
     );
 
@@ -105,8 +104,7 @@ export abstract class Draw implements BaseDataInterface {
       this.clockwise,
       -1
     );
-    console.log("angleCalculated", angleCalculated);
-
+    console.log("angleCalculated", angleCalculated); 
     if (this.displayAngle) {
       this.printAngle(canvasContext, angleCalculated, currentAngleReference, {
         x: newX,
@@ -175,6 +173,24 @@ export abstract class Draw implements BaseDataInterface {
       return Orientation.DESCENDING;
     }
     return Orientation.HORIZONTAL;
+  }
+
+  getAngleQuadrant(newAngle: number): number {
+    const currentAngle = newAngle % 360;
+    const angle = currentAngle < 0 ? 360 + currentAngle : currentAngle;
+    if (angle > 0 && angle < 90) {
+      return 1;
+    }
+    if (angle > 90 && angle < 180) {
+      return 2;
+    }
+    if (angle > 180 && angle < 270) {
+      return 3;
+    }
+    if (angle > 270 && angle < 360) {
+      return 4;
+    }
+    return 0;
   }
 
   static createInstance<T extends Draw>(

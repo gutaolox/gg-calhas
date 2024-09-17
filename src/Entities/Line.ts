@@ -1,11 +1,8 @@
 import {
-  centimeterToPixelConversor,
   convertDeegreToRadian,
   convertRadianToDegree,
 } from "@/util/convertDeegreToRadian";
 import { Draw } from "./Draw";
-import { Orientation } from "./Orientation";
-import { LineProps } from "@/app/page";
 
 export class Line extends Draw {
   sizeControl = 1;
@@ -24,13 +21,7 @@ export class Line extends Draw {
 
     canvasContext.lineTo(newX, newY);
 
-    this.printValue(
-      canvasContext,
-      newX,
-      newY,
-      convertRadianToDegree(radianAngle),
-      initialPoint
-    );
+    this.printValue(canvasContext, newX, newY, radianAngle, initialPoint);
     return { newX, newY };
   }
 
@@ -43,42 +34,18 @@ export class Line extends Draw {
   ): void {
     const orientation = this.getOrientation(angle);
     const multiplier = this.textOnSum ? 1 : -1;
-    const numberToMove = 12;
+
+    const numberToMove = 20;
 
     const middleX = (initialPoint.x + newX) / 2;
     const middleY = (initialPoint.y + newY) / 2;
-    if (orientation === Orientation.HORIZONTAL) {
-      const ditanceToLineAdditionOnX = -5 * this.sizeControl;
-      const ditanceToLineAdditionOnY = 4 * this.sizeControl;
-      canvasContext.fillText(
-        `${this.size}`,
-        middleX + ditanceToLineAdditionOnX,
-        middleY - multiplier * numberToMove + ditanceToLineAdditionOnY
-      );
-    }
-    if (orientation === Orientation.VERTICAL) {
-      const ditanceToLineAddition = 4 * this.sizeControl;
-      canvasContext.fillText(
-        `${this.size}`,
-        middleX + multiplier * numberToMove,
-        middleY - ditanceToLineAddition
-      );
-    }
-    if (orientation === Orientation.ASCENDING) {
-      const ditanceToLineAddition = -6 * this.sizeControl;
-      canvasContext.fillText(
-        `${this.size}`,
-        middleX - multiplier * numberToMove + ditanceToLineAddition,
-        middleY + multiplier * numberToMove
-      );
-    }
-    if (orientation === Orientation.DESCENDING) {
-      canvasContext.fillText(
-        `${this.size}`,
-        middleX + multiplier * numberToMove,
-        middleY - multiplier * numberToMove
-      );
-    }
+    const { x, y } = this.findPoint(
+      { x: middleX, y: middleY },
+      numberToMove,
+      convertDeegreToRadian(this.getAngleOnDraw() + 90 * multiplier)
+    );
+
+    canvasContext.fillText(`${this.size}`, x, y);
   }
 
   printAngle(
@@ -88,16 +55,46 @@ export class Line extends Draw {
     initialPoint: { x: number; y: number }
   ): void {
     canvasContext.moveTo(initialPoint.x, initialPoint.y);
-
-    const initalAngleRadian = convertDeegreToRadian(angleCalculated);
+    const bissetriz = angleCalculated - (oldAngleNumber - angleCalculated) / 2;
     const endAngleRadian = convertDeegreToRadian(oldAngleNumber - 180);
+    const initalAngleRadian = convertDeegreToRadian(angleCalculated);
+    const novaAnalise =
+      initalAngleRadian +
+      ((Math.abs(endAngleRadian) - Math.abs(initalAngleRadian)) / 2) *
+        (!this.clockwise ? -1 : 1);
     canvasContext.arc(
       initialPoint.x,
       initialPoint.y,
-      10,
+      20,
       initalAngleRadian,
       endAngleRadian,
       !this.clockwise
+    );
+
+    const { x, y } = this.findPoint(
+      { x: initialPoint.x, y: initialPoint.y },
+      40,
+      novaAnalise
+    );
+    const quadrant = this.getAngleQuadrant(convertRadianToDegree(novaAnalise));
+    let adaptedX = x;
+    let adaptedY = y;
+    if (quadrant === 1) {
+      adaptedX = x - 15;
+      adaptedY = y + 3;
+    }
+    if (quadrant === 2) {
+      adaptedX = x - 5;
+      adaptedY = y + 5;
+    }
+    if (quadrant === 4) {
+      adaptedX = x - 10;
+      adaptedY = y + 10;
+    }
+    canvasContext.fillText(
+      `${this.angleToNextPoint + this.totalAddtionalAngle}`,
+      adaptedX,
+      adaptedY
     );
   }
 }

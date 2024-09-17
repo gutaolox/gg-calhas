@@ -128,7 +128,6 @@ export default function Home() {
             line.textOnSum,
             line.displayAngle
           );
-      console.log(count);
       count++;
       initiLines.append(selectedObj);
     });
