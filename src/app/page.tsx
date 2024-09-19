@@ -1,9 +1,10 @@
-"use client"
+"use client";
 import { DrawArea } from "@/DrawArea/DrawArea";
 import { Arc } from "@/Entities/Arc";
+import { DoublyLinkedList } from "@/Entities/BaseStructures/DoublyLinkedList";
 import { Draw } from "@/Entities/Draw";
 import { Line } from "@/Entities/Line";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 
 export interface LineProps {
   size: number;
@@ -14,9 +15,7 @@ export interface LineProps {
   textOnSum: boolean;
   displayAngle: boolean;
 }
-
-
-
+let count = 0;
 const drawInfo = [
   {
     name: "Calhador",
@@ -26,7 +25,7 @@ const drawInfo = [
         //somar angulo antes de somar
         size: 1,
         angleToNextPoint: 0,
-        clockwise: false, // antiohorario somar o angulo atual com angulo -180 e sentido horario só somar o angulo
+        clockwise: true, // antiohorario somar o angulo atual com angulo -180 e sentido horario só somar o angulo
         isArc: false, //quando for arco adicionar o raio no display do texto dependendo da combinação de textOnSum e clockwise
         arcProportion: 0, //para achar o centro do circulo soma o raio na mesma direção pra achar o centro
         textOnSum: true,
@@ -39,7 +38,7 @@ const drawInfo = [
         isArc: false,
         arcProportion: 0,
         textOnSum: false,
-        displayAngle: false,
+        displayAngle: true,
       },
       {
         size: 10,
@@ -48,7 +47,7 @@ const drawInfo = [
         isArc: false,
         arcProportion: 0,
         textOnSum: true,
-        displayAngle: false,
+        displayAngle: true,
       },
       {
         size: 2,
@@ -57,12 +56,12 @@ const drawInfo = [
         isArc: false,
         arcProportion: 0,
         textOnSum: true,
-        displayAngle: false,
+        displayAngle: true,
       },
       {
         size: 6.5,
         angleToNextPoint: 0,
-        clockwise: false,
+        clockwise: true,
         isArc: true,
         arcProportion: 0.25,
         textOnSum: true,
@@ -70,7 +69,7 @@ const drawInfo = [
       },
       {
         size: 2,
-        angleToNextPoint: 120,
+        angleToNextPoint: 60,
         clockwise: true,
         isArc: false,
         arcProportion: 0,
@@ -79,12 +78,12 @@ const drawInfo = [
       },
       {
         size: 2.5,
-        angleToNextPoint: 60,
+        angleToNextPoint: 120,
         clockwise: false,
         isArc: false,
         arcProportion: 0,
         textOnSum: true,
-        displayAngle: false,
+        displayAngle: true,
       },
       {
         size: 1,
@@ -93,7 +92,7 @@ const drawInfo = [
         isArc: false,
         arcProportion: 0,
         textOnSum: false,
-        displayAngle: false,
+        displayAngle: true,
       },
       {
         size: 1,
@@ -102,18 +101,19 @@ const drawInfo = [
         isArc: false,
         arcProportion: 0,
         textOnSum: false,
-        displayAngle: false,
+        displayAngle: true,
       },
     ],
   },
 ];
 
 export default function Home() {
-  const [lines, setLines] = useState<Draw[]>(
-    drawInfo[0].lines.map((line) =>
-      line.isArc
+  const [lines, setLines] = useState<DoublyLinkedList<Draw>>(() => {
+    const initiLines = new DoublyLinkedList<Draw>();
+    drawInfo[0].lines.forEach((line) => {
+      const selectedObj = line.isArc
         ? new Arc(
-            line.size ,
+            line.size,
             line.angleToNextPoint,
             line.clockwise,
             line.arcProportion,
@@ -127,12 +127,20 @@ export default function Home() {
             line.arcProportion,
             line.textOnSum,
             line.displayAngle
-          )
-    )
-  );
+          );
+      count++;
+      initiLines.append(selectedObj);
+    });
+    return initiLines;
+  });
   return (
     <div>
-      <DrawArea name={drawInfo[0].name} code={drawInfo[0].code} lines={lines} setLines={setLines} />
+      <DrawArea
+        name={drawInfo[0].name}
+        code={drawInfo[0].code}
+        lines={lines}
+        setLines={setLines}
+      />
     </div>
   );
 }

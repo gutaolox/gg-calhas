@@ -5,34 +5,41 @@ import {
 } from "@/util/convertDeegreToRadian";
 import { Draw } from "./Draw";
 import { Orientation } from "./Orientation";
+import { LineProps } from "@/app/page";
 
 export class Arc extends Draw {
   calculateNextPoint(
     canvasContext: CanvasRenderingContext2D,
-    radianAngle: number
+    radianAngle: number,
+    initialPoint: { x: number; y: number },
+    isBackward?: boolean
   ): { newX: number; newY: number } {
     const radius =
       this.convertSizerToPixel(this.size) / this.arcProportion / (2 * Math.PI);
-
-    const { x: newX, y: newY } = this.findPoint(
-      { x: this.initialX, y: this.initialY },
-      radius,
-      radianAngle
-    );
-
     const arcToAnngle = 360 * this.arcProportion;
     const returningToPointAnglein = this.targetedAngle(
       arcToAnngle,
-      !this.clockwise
+      this.clockwise
     );
     const newAngleToRadian =
       convertDeegreToRadian(returningToPointAnglein) + radianAngle; // passar esse angulo pra printar
     // se for horario só subtrai e anti horario só soma o angulo
+    const { x: newX, y: newY } = this.findPoint(
+      { x: initialPoint.x, y: initialPoint.y },
+      radius,
+      isBackward ? newAngleToRadian : radianAngle
+    );
+
+    console.log("returningToPointAnglein", returningToPointAnglein);
+
+    console.log("newAngleToRadian", convertRadianToDegree(newAngleToRadian));
     const { x: finalX, y: finalY } = this.findPoint(
       { x: newX, y: newY },
       radius,
-      newAngleToRadian
+      isBackward ? radianAngle : newAngleToRadian
     );
+
+    const ajuda = isBackward ? this.clockwise : !this.clockwise;
 
     canvasContext.moveTo(finalX, finalY);
     const proportionRadianAngle = 2 * Math.PI * this.arcProportion;
@@ -40,20 +47,28 @@ export class Arc extends Draw {
       newX,
       newY,
       radius,
-      0,
-      proportionRadianAngle,
-      this.clockwise
+      isBackward ? radianAngle : newAngleToRadian,
+      isBackward ? newAngleToRadian - Math.PI : radianAngle - Math.PI,
+      ajuda
     );
-    this.printValue(canvasContext, newX, newY, radius, proportionRadianAngle);
+    this.printArcValue(
+      canvasContext,
+      newX,
+      newY,
+      radius,
+      isBackward ? radianAngle -2* Math.PI : newAngleToRadian,
+      proportionRadianAngle
+    );
 
     return { newX: finalX, newY: finalY };
   }
 
-  printValue(
+  printArcValue(
     canvasContext: CanvasRenderingContext2D,
     newX: number,
     newY: number,
     radius: number,
+    drawAngle: number,
     angle: number
   ): void {
     const distanceMinValue = 8;
@@ -61,10 +76,12 @@ export class Arc extends Draw {
       radius +
       (radius < distanceMinValue ? radius : distanceMinValue) *
         (this.textOnSum ? 1 : -1);
-    let angleReference = (angle / 2) * (this.clockwise ? -1 : 1);
+    let angleReference = drawAngle +((angle / 2) * (this.clockwise ? -1 : 1));
     const orientation = this.getOrientation(
       convertRadianToDegree(angleReference)
     );
+
+    console.log("angleReference", convertRadianToDegree(angleReference));
 
     if (orientation === Orientation.ASCENDING) {
       angleReference = angleReference - Math.PI / 2;
