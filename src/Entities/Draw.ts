@@ -12,7 +12,7 @@ export abstract class Draw implements BaseDataInterface {
   private finalX = 0;
   private finalY = 0;
   private angleOnDraw = 0;
-  public moveRightSide = false;
+  public moveRightSide = true;
   public totalAddtionalAngle = 0;
   public currentAngleDiff = 0;
   constructor(
@@ -90,13 +90,18 @@ export abstract class Draw implements BaseDataInterface {
     const newAngleInReadian = convertDeegreToRadian(
       currentAngleReference - 180
     );
-    console.log(this instanceof Arc)
-    console.log("currentAngleReference", currentAngleReference);
-    console.log("size", this.angleToNextPoint);
+    if (this instanceof Arc) {
+      
+      console.log(this instanceof Arc)
+      console.log("currentAngleReference", currentAngleReference - 90);
+      console.log("size", this.angleToNextPoint);
+      //currentAngleReference = currentAngleReference - 90;
+    }
     const { newX, newY } = this.calculateNextPoint(
       canvasContext,
       newAngleInReadian ,
-      { x: this.finalX, y: this.finalY }
+      { x: this.finalX, y: this.finalY },
+      true
     );
 
     const angleCalculated = this.moveAngle(
@@ -104,7 +109,6 @@ export abstract class Draw implements BaseDataInterface {
       this.clockwise,
       -1
     );
-    console.log("angleCalculated", angleCalculated); 
     if (this.displayAngle) {
       this.printAngle(canvasContext, angleCalculated, currentAngleReference, {
         x: newX,
@@ -118,7 +122,8 @@ export abstract class Draw implements BaseDataInterface {
   abstract calculateNextPoint(
     canvasContext: CanvasRenderingContext2D,
     radianAngle: number,
-    initialPoint: { x: number; y: number }
+    initialPoint: { x: number; y: number },
+    isBackward?: boolean
   ): { newX: number; newY: number };
 
   moveAngle(
