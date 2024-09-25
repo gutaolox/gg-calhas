@@ -5,6 +5,7 @@ import {
 import { Draw } from "@/Entities/Draw";
 import { convertDeegreToRadian } from "@/util/convertDeegreToRadian";
 import { useEffect, useRef, useState } from "react";
+import AngleInput from "./AngleInput";
 
 export interface DrawAreaProps {
   name: string;
@@ -188,6 +189,36 @@ export const DrawArea = (props: DrawAreaProps) => {
     }
   };
 
+
+
+
+
+  function changeAngleInput(event: React.ChangeEvent<HTMLInputElement> ) {
+    const valueInNumber = parseFloat(event.target.value || "120");
+    const lineNod = props.lines.search(6)!.nod;
+    const newLine = lineNod.data;
+    const angleDiff =
+      valueInNumber -
+      (newLine.angleToNextPoint + newLine.totalAddtionalAngle);
+
+    newLine.totalAddtionalAngle += angleDiff;
+    newLine.currentAngleDiff = angleDiff;
+
+    // newLine?.setAngleOnDraw(
+    //   newLine.getAngleOnDraw() + newLine.totalAddtionalAngle
+    // );
+    setLastLineChanged(lineNod);
+    setAngle(valueInNumber);
+    // props.setLines(props.lines);
+  }
+
+
+
+
+
+
+
+
   return (
     <div
       style={{
@@ -199,29 +230,15 @@ export const DrawArea = (props: DrawAreaProps) => {
       }}
     >
       <canvas ref={canvasRef} id="canvas" width="4000" height="2500" />
-      <input
+      <AngleInput changeAngle={changeAngleInput}/>
+
+      {/* <input
         style={{ borderWidth: "10px", borderColor: "black" }}
         type="number"
         defaultValue={120}
-        onChange={(e) => {
-          const valueInNumber = parseFloat(e.target.value || "120");
-          const lineNod = props.lines.search(6)!.nod;
-          const newLine = lineNod.data;
-          const angleDiff =
-            valueInNumber -
-            (newLine.angleToNextPoint + newLine.totalAddtionalAngle);
-
-          newLine.totalAddtionalAngle += angleDiff;
-          newLine.currentAngleDiff = angleDiff;
-
-          // newLine?.setAngleOnDraw(
-          //   newLine.getAngleOnDraw() + newLine.totalAddtionalAngle
-          // );
-          setLastLineChanged(lineNod);
-          setAngle(valueInNumber);
-          // props.setLines(props.lines);
-        }}
-      />
+        onChange={changeAngleInput}
+      /> */}
+      
       <button
         style={{
           borderWidth: "10px",
@@ -233,6 +250,7 @@ export const DrawArea = (props: DrawAreaProps) => {
       >
         Exportar
       </button>
+      
     </div>
   );
 };
