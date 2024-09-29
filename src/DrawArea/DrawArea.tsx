@@ -217,8 +217,8 @@ export const DrawArea = (props: DrawAreaProps) => {
           // newLine?.setAngleOnDraw(
           //   newLine.getAngleOnDraw() + newLine.totalAddtionalAngle
           // );
-          setLastLineChanged(lineNod);
-          setAngle(valueInNumber);
+          onAngleChange(lineNod, canvasRef.current!.getContext("2d")!);
+        
           // props.setLines(props.lines);
         }}
       />
