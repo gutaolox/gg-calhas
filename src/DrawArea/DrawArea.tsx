@@ -193,16 +193,12 @@ export const DrawArea = (props: DrawAreaProps) => {
 
 
 
-  function changeAngleInput(event: React.ChangeEvent<HTMLInputElement>, sentido:boolean) {
-    let valueInNumber;
-    if(sentido){
-      valueInNumber = 360-parseFloat(event.target.value || "120");
-    }
-    else{  
-      valueInNumber = parseFloat(event.target.value || "120");
-    }
+  function changeAngleInput(event: React.ChangeEvent<HTMLInputElement>, checked: boolean, id: number) {
+   
+    const valueInNumber = parseFloat(event.target.value || "120");
     
-    const lineNod = props.lines.search(6)!.nod;
+    
+    const lineNod = props.lines.search(id)!.nod;
       const newLine = lineNod.data;
       const angleDiff =
         valueInNumber -
@@ -211,14 +207,16 @@ export const DrawArea = (props: DrawAreaProps) => {
       newLine.totalAddtionalAngle += angleDiff;
       newLine.currentAngleDiff = angleDiff;
 
+     
+      lineNod.data.moveRightSide = !checked
+      
       // newLine?.setAngleOnDraw(
       //   newLine.getAngleOnDraw() + newLine.totalAddtionalAngle
       // );
       setLastLineChanged(lineNod);
       setAngle(valueInNumber);
-
-      return valueInNumber;
     
+      return valueInNumber;
   }
 
 
