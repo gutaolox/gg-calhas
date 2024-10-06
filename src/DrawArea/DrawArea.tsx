@@ -6,6 +6,7 @@ import { Draw } from "@/Entities/Draw";
 import { convertDeegreToRadian } from "@/util/convertDeegreToRadian";
 import { useEffect, useRef, useState } from "react";
 import AngleInput from "./AngleInput";
+import SizeInput from "./SizeInput";
 
 export interface DrawAreaProps {
   name: string;
@@ -20,6 +21,7 @@ export const DrawArea = (props: DrawAreaProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [lastLineChanged, setLastLineChanged] = useState<Nod<Draw>>();
   const [angle, setAngle] = useState(90);
+  const [size, setSize] = useState(6);
   const toRightDraw = (
     initialXOnDraw: number,
     initialYOnDraw: number,
@@ -156,7 +158,7 @@ export const DrawArea = (props: DrawAreaProps) => {
     onAngleChange(lastLineChanged, context);
     context.closePath();
     context.stroke();
-  }, [angle]);
+  }, [angle, size]);
 
   const initialContextSetUp = (
     canvas: HTMLCanvasElement,
@@ -193,12 +195,13 @@ export const DrawArea = (props: DrawAreaProps) => {
 
 
 
-  function changeAngleInput(event: React.ChangeEvent<HTMLInputElement>, checked: boolean, id: number) {
+  function changeAngleInput( checked: boolean, id: number, value:number) {
    
-    const valueInNumber = parseFloat(event.target.value || "120");
+    const valueInNumber = value;
     
     
     const lineNod = props.lines.search(id)!.nod;
+    
       const newLine = lineNod.data;
       const angleDiff =
         valueInNumber -
@@ -207,7 +210,7 @@ export const DrawArea = (props: DrawAreaProps) => {
       newLine.totalAddtionalAngle += angleDiff;
       newLine.currentAngleDiff = angleDiff;
 
-     
+     //Troca a orientação
       lineNod.data.moveRightSide = !checked
       
       // newLine?.setAngleOnDraw(
@@ -220,7 +223,15 @@ export const DrawArea = (props: DrawAreaProps) => {
   }
 
 
-
+  function changeSizeInput(id: number, value:number) {
+ 
+    const lineNod = props.lines.search(id)!.nod;
+    const newLine = lineNod.data;
+    newLine.size = value;
+    setLastLineChanged(lineNod)
+    setSize(value)
+    
+  }
 
 
 
@@ -237,13 +248,13 @@ export const DrawArea = (props: DrawAreaProps) => {
       }}
     >
       <canvas ref={canvasRef} id="canvas" width="4000" height="2500" />
-      <AngleInput changeAngle={changeAngleInput}/>
-
+      <AngleInput changeAngle={changeAngleInput} draw={props}/>
+      <SizeInput changeSize={changeSizeInput} draw={props}/>
       {/* <input
         style={{ borderWidth: "10px", borderColor: "black" }}
         type="number"
         defaultValue={120}
-        onChange={changeAngleInput}
+        onChange={changeSizeInput}
       /> */}
       
       <button

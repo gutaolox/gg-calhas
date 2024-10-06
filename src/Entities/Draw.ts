@@ -65,7 +65,7 @@ export abstract class Draw implements BaseDataInterface {
       multiplier
     );
     const newAngleInReadian = convertDeegreToRadian(angleCalculated);
-
+    //console.log("angleCalculated", angleCalculated)
     const { newX, newY } = this.calculateNextPoint(
       canvasContext,
       newAngleInReadian,
