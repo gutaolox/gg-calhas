@@ -41,8 +41,8 @@ const drawInfo = [
         displayAngle: true,
       },
       {
-        size: 10,
-        angleToNextPoint: 90,
+        size: 5,
+        angleToNextPoint: 110,
         clockwise: false,
         isArc: false,
         arcProportion: 0,
@@ -51,7 +51,7 @@ const drawInfo = [
       },
       {
         size: 2,
-        angleToNextPoint: 90,
+        angleToNextPoint: 70,
         clockwise: false,
         isArc: false,
         arcProportion: 0,
