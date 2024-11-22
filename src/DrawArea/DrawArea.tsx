@@ -253,10 +253,11 @@ export const DrawArea = (props: DrawAreaProps) => {
       {/* <input
         style={{ borderWidth: "10px", borderColor: "black" }}
         type="number"
-        defaultValue={120}
+        defaultValue={12
         onChange={changeSizeInput}
       /> */}
       
+
       <button
         style={{
           borderWidth: "10px",
